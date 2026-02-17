@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Global Opportunities - EduCoreX{% endblock %}
+
+{% block content %}
+<style>
+    /* Override any light theme colors with your palette */
+    .dashboard-card {
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .dashboard-card:hover {
+        border-color: #00bfa6 !important;
+        box-shadow: 0 20px 40px rgba(0, 191, 166, 0.2) !important;
+    }
+    
+    .card-title {
+        color: #00bfa6 !important;
+    }
+    
+    .card-description, p {
+        color: #e0e0e0 !important;
+    }
+    
+    .progress-card {
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .progress-card h3 {
+        color: #00bfa6 !important;
+    }
+    
+    .search-container {
+        margin-bottom: 30px;
+        width: 100%;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 10px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        color: white;
+        font-size: 1rem;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #00bfa6;
+    }
+    
+    .search-btn {
+        padding: 15px 30px;
+        background: #00bfa6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .search-btn:hover {
+        background: #00a08a;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 191, 166, 0.3);
+    }
+    
+    .opportunity-image {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 8px 8px 0 0;
+        margin-bottom: 15px;
+    }
+    
+    .image-placeholder {
+        width: 100%;
+        height: 160px;
+        background: linear-gradient(135deg, #0e1e2d, #1a2f47);
+        border-radius: 8px 8px 0 0;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #00bfa6;
+    }
+    
+    .deadline {
+        font-size: 0.85rem;
+        color: #e0e0e0 !important;
+        margin: 10px 0;
+        opacity: 0.8;
+    }
+    
+    .no-link {
+        color: #666;
+        font-size: 0.9rem;
+        font-style: italic;
+    }
+    
+    .empty-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 50px;
+        color: #e0e0e0;
+        font-size: 1.2rem;
+    }
+</style>
+
+<!-- Search Section -->
+<section class="progress-section">
+    <div class="progress-card" style="padding: 30px;">
+        <h3 style="text-align: center; margin-bottom: 20px;">🌍 Global Scholarship Hub</h3>
+        <p style="text-align: center; margin-bottom: 30px;">Verified, authentic opportunities curated by EduCoreX Admins.</p>
+        
+        <div class="search-container">
+            <form method="GET" action="{% url 'opportunities' %}" class="search-form">
+                <input type="text" 
+                       name="search" 
+                       class="search-input"
+                       placeholder="Search by country, university, or organization..." 
+                       value="{{ search_query }}">
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-content">
+    <div class="dashboard-grid">
+        {% for opp in opportunities %}
+        <div class="dashboard-card" style="padding: 0; overflow: hidden;">
+            <!-- University Image -->
+            {% if opp.image %}
+                <img src="{{ opp.image.url }}" alt="{{ opp.title }}" class="opportunity-image">
+            {% else %}
+                <div class="image-placeholder">
+                    🎓
+                </div>
+            {% endif %}
+            
+            <!-- Content -->
+            <div style="padding: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span class="card-badge" style="background: #00bfa6; color: white;">{{ opp.funding }}</span>
+                    <span style="color: #e0e0e0; font-size: 0.9rem;">{{ opp.opportunity_type }}</span>
+                </div>
+                
+                <h3 class="card-title" style="font-size: 1.2rem; margin-bottom: 10px;">{{ opp.title }}</h3>
+                
+                <p class="card-description" style="margin-bottom: 5px;">
+                    <strong>🏛️ {{ opp.organization }}</strong>
+                </p>
+                
+                <p class="card-description" style="margin-bottom: 5px;">
+                    <strong>📍 {{ opp.country }}</strong>
+                </p>
+                
+                <p class="deadline">
+                    ⏰ Deadline: {{ opp.deadline|date:"M d, Y" }}
+                </p>
+                
+                <p class="card-description" style="font-size: 0.9rem; margin: 15px 0;">
+                    {{ opp.description|truncatechars:100 }}
+                </p>
+                
+                {% if opp.url %}
+                    <a href="{{ opp.url }}" target="_blank" rel="noopener noreferrer" class="card-link" style="display: inline-block; margin-top: 10px;">
+                        See Details →
+                    </a>
+                {% else %}
+                    <span class="no-link">Link coming soon</span>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-message">
+            <p>No opportunities found matching "{{ search_query }}". Check back later!</p>
+            {% if search_query %}
+                <p><a href="{% url 'opportunities' %}" style="color: #00bfa6;">Clear search</a></p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
